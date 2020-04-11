@@ -4,3 +4,8 @@
 require_relative "config/application"
 
 Rails.application.load_tasks
+
+if Rails.env.development? || Rails.env.test?
+  Rake::Task[:default].clear_prerequisites
+  task default: %i[spec rubocop]
+end
