@@ -1,0 +1,84 @@
+version: 2.1
+executors:
+  ruby_node_pg_redis:
+    docker:
+      - image: circleci/ruby:2.6.5-node-browsers
+        environment:
+          BUNDLE_JOBS: 4
+          BUNDLE_PATH: vendor/bundle
+          PGHOST: 127.0.0.1
+          PGUSER: postgres
+          RAILS_ENV: test
+          CORS_ORIGINS: "*"
+      - image: circleci/postgres:11.6-alpine
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: mr_stalky_test
+          POSTGRES_PASSWORD: ""
+
+commands:
+  bundle_install:
+    steps:
+      # Bundle install dependencies and remove any unused gems
+      - run:
+          name: bundle install
+          command: |
+            gem install bundler
+            bundle check || bundle install
+
+jobs:
+  build:
+    environment:
+      DISABLE_SPRING: true
+      RAILS_ENV: test
+      RACK_ENV: test
+      CI: true
+    executor: ruby_node_pg_redis
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - mr_stalky-cache-{{ checksum "Gemfile.lock" }}
+            - mr_stalky-cache-
+
+      - bundle_install
+
+      - save_cache:
+          name: Save Cache
+          key: mr_stalky-cache-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
+
+      # Rubocop compliance
+      - run: bundle exec rubocop -P
+
+      # Database setup (note: db:setup creates development and test dbs, applies seeds to development)
+      - run: bundle exec rake db:setup
+
+      - run:
+          name: Run tests
+          command: |
+            bundle exec rspec spec --format doc
+
+      # Save test results, so the the timings can be used in future parallel runs
+      - store_test_results:
+          path: ./test-results
+
+      # Save the test logs for debugging
+      - store_artifacts:
+          path: ./log/test.log
+          destination: test.log
+
+      # Save screenshots for debugging
+      - store_artifacts:
+          path: ./tmp/screenshots
+
+      - store_artifacts:
+          path: ./coverage
+
+workflows:
+  version: 2.1
+  build:
+    jobs:
+      - build
