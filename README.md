@@ -1,24 +1,5 @@
-# README
+# MrStalky
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+> A Slack bot that helps you get the best price for you Animal Crossing: New Horizons turnips
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+[![CircleCI](https://circleci.com/gh/rdavid1099/mr_stalky.svg?style=svg)](https://app.circleci.com/pipelines/github/rdavid1099/mr_stalky)
