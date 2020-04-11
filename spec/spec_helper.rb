@@ -26,6 +26,11 @@ RSpec.configure do |config|
     # ...rather than:
     #     # => "be bigger than 2"
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
+
+    # disable the `should` syntax...
+    # this does not restrict the use of should in the receiver is implicit (such as 'subject')
+    #    for instance : it { should do(XYZ) }
+    expectations.syntax = :expect
   end
 
   # rspec-mocks config goes here. You can use an alternate test double
@@ -56,7 +61,7 @@ RSpec.configure do |config|
   #   # Allows RSpec to persist some state between runs in order to support
   #   # the `--only-failures` and `--next-failure` CLI options. We recommend
   #   # you configure your source control system to ignore this file.
-  #   config.example_status_persistence_file_path = "spec/examples.txt"
+  config.example_status_persistence_file_path = "spec/examples.txt"
   #
   #   # Limits the available syntax to the non-monkey patched syntax that is
   #   # recommended. For more details, see:
@@ -84,7 +89,7 @@ RSpec.configure do |config|
   #   # order dependency and want to debug it, you can fix the order by providing
   #   # the seed, which is printed after each run.
   #   #     --seed 1234
-  #   config.order = :random
+  config.order = :random
   #
   #   # Seed global randomization in this process using the `--seed` CLI option.
   #   # Setting this allows you to use `--seed` to deterministically reproduce
