@@ -6,12 +6,12 @@ class AppMentionService
   attr_reader :payload
 
   def initialize(payload)
-    @payload = JSON.parse(payload)
+    @payload = payload
   end
 
   def respond
     slack_response = post_message(
-      channel: payload["event"]["channel"],
+      channel: payload[:event][:channel],
       text: "STALKS!",
     )
     slack_response[:ok]

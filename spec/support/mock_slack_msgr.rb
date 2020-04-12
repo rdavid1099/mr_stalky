@@ -1,5 +1,6 @@
 class MockSlackMsgr
-  def chat(*args)
+  def self.chat(*_args)
+    { ok: true }
   end
 end
 
