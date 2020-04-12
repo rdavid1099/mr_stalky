@@ -1,5 +1,5 @@
 class AppMentionService
-  COMMANDS = %i[record].freeze
+  COMMANDS = %i[record whatsup].freeze
 
   attr_reader :event_params, :user
 
@@ -18,6 +18,7 @@ class AppMentionService
     slack_response = post_message(
       channel: event_params[:channel],
       text: response,
+      blocks: blocks,
     )
     slack_response[:ok]
   end
@@ -30,14 +31,45 @@ class AppMentionService
 
     return unless turnip_price_record.save
 
-    @response =
-      "Thank you, <@#{user.slack_id}>! Your price of #{turnip_price_record.price} bells has been successfully recorded."
+    declare_response("Thank you, <@#{user.slack_id}>! " \
+      "Your price of #{turnip_price_record.price} bells has been successfully recorded.")
+  end
+
+  def whatsup
+    current_top_prices = TurnipPriceRecord.current_top_prices.limit(5)
+
+    if current_top_prices.empty?
+      return declare_response("I don't have any turnip prices at this time. " \
+        "Please type `@MrStalky record <price>` to record your turnip prices.")
+    end
+
+    field_headers = [{ type: "mrkdwn", text: "*User*" }, { type: "mrkdwn", text: "*Bells*" }]
+    fields = current_top_prices.reduce(field_headers) do |_result, price_record|
+      field_headers << { type: "mrkdwn", text: "<@#{price_record.user.slack_id}>" }
+      field_headers << { type: "plain_text", text: price_record.price.to_s }
+    end
+
+    declare_response("")
+
+    add_to_blocks({
+                    type: "section",
+                    text: {
+                      text: "The *top* turnip prices recorded this time period",
+                      type: "mrkdwn",
+                    },
+                    fields: fields,
+                  })
+
+    true
   end
 
   private
 
   def valid_command?
-    { record: (stripped_text.count == 1 && stripped_text.first.to_i.positive?) }[command]
+    {
+      record: (stripped_text.count == 1 && stripped_text.first.to_i.positive?),
+      whatsup: stripped_text.count.zero?,
+    }[command]
   end
 
   def command
@@ -64,6 +96,18 @@ class AppMentionService
 
   def slack_msgr
     Rails.configuration.slack_msgr
+  end
+
+  def add_to_blocks(block)
+    blocks << block
+  end
+
+  def blocks
+    @blocks ||= []
+  end
+
+  def declare_response(response)
+    @response = response
   end
 
   def response

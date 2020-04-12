@@ -32,6 +32,7 @@ describe Api::MentionsController do
           expect_any_instance_of(AppMentionService).to receive(:post_message).with(
             channel: "C0LAN2Q65",
             text: "Thank you, <@#{user.slack_id}>! Your price of 123 bells has been successfully recorded.",
+            blocks: [],
           )
             .and_return({ ok: true })
         end
@@ -67,6 +68,7 @@ describe Api::MentionsController do
             channel: "C0LAN2Q65",
             text: "I'm sorry. I didn't quite get that. " \
                   "Please type `@MrStalky help` for a list of the commands I understand.",
+            blocks: [],
           )
             .and_return({ ok: true })
         end

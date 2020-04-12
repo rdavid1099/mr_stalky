@@ -1,5 +1,7 @@
 module Api
   class MentionsController < ApplicationController
+    before_action :return_challenge, if: :challenge_param_present?
+
     def create
       user = User.find_or_create_by(slack_id: event_params[:user])
 
@@ -14,6 +16,14 @@ module Api
 
     def event_params
       params.require(:event).permit(:user, :ts, :text, :channel)
+    end
+
+    def challenge_param_present?
+      params[:challenge].present?
+    end
+
+    def return_challenge
+      render json: { challenge: params[:challenge] }
     end
   end
 end
