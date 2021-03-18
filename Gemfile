@@ -16,7 +16,7 @@ group :development, :test do
   gem "faker"
   gem "pry"
   gem "rspec-collection_matchers"
-  gem "rspec-rails", "~>4"
+  gem "rspec-rails", "~>5"
   gem "rubocop", require: false
   gem "rubocop-performance", require: false
   gem "rubocop-rails", require: false
